@@ -49,12 +49,26 @@ cmake_ninja_workdir = /home/kidebratzp/Desktop/Projekat/cmake-build-debug/
 
 build cmake_object_order_depends_target_Projekat: phony || cmake_object_order_depends_target_glad
 
-build CMakeFiles/Projekat.dir/main.cpp.o: CXX_COMPILER__Projekat_Debug /home/kidebratzp/Desktop/Projekat/main.cpp || cmake_object_order_depends_target_Projekat
-  DEP_FILE = CMakeFiles/Projekat.dir/main.cpp.o.d
+build CMakeFiles/Projekat.dir/src/main.cpp.o: CXX_COMPILER__Projekat_Debug /home/kidebratzp/Desktop/Projekat/src/main.cpp || cmake_object_order_depends_target_Projekat
+  DEP_FILE = CMakeFiles/Projekat.dir/src/main.cpp.o.d
   FLAGS = -g -fdiagnostics-color=always
   INCLUDES = -I/home/kidebratzp/Desktop/Projekat/include -I/home/kidebratzp/Desktop/Projekat/libs/glad/include
   OBJECT_DIR = CMakeFiles/Projekat.dir
-  OBJECT_FILE_DIR = CMakeFiles/Projekat.dir
+  OBJECT_FILE_DIR = CMakeFiles/Projekat.dir/src
+
+build CMakeFiles/Projekat.dir/src/Shader.cpp.o: CXX_COMPILER__Projekat_Debug /home/kidebratzp/Desktop/Projekat/src/Shader.cpp || cmake_object_order_depends_target_Projekat
+  DEP_FILE = CMakeFiles/Projekat.dir/src/Shader.cpp.o.d
+  FLAGS = -g -fdiagnostics-color=always
+  INCLUDES = -I/home/kidebratzp/Desktop/Projekat/include -I/home/kidebratzp/Desktop/Projekat/libs/glad/include
+  OBJECT_DIR = CMakeFiles/Projekat.dir
+  OBJECT_FILE_DIR = CMakeFiles/Projekat.dir/src
+
+build CMakeFiles/Projekat.dir/src/Camera.cpp.o: CXX_COMPILER__Projekat_Debug /home/kidebratzp/Desktop/Projekat/src/Camera.cpp || cmake_object_order_depends_target_Projekat
+  DEP_FILE = CMakeFiles/Projekat.dir/src/Camera.cpp.o.d
+  FLAGS = -g -fdiagnostics-color=always
+  INCLUDES = -I/home/kidebratzp/Desktop/Projekat/include -I/home/kidebratzp/Desktop/Projekat/libs/glad/include
+  OBJECT_DIR = CMakeFiles/Projekat.dir
+  OBJECT_FILE_DIR = CMakeFiles/Projekat.dir/src
 
 
 # =============================================================================
@@ -64,7 +78,7 @@ build CMakeFiles/Projekat.dir/main.cpp.o: CXX_COMPILER__Projekat_Debug /home/kid
 #############################################
 # Link the executable Projekat
 
-build Projekat: CXX_EXECUTABLE_LINKER__Projekat_Debug CMakeFiles/Projekat.dir/main.cpp.o | libs/glad/libglad.a /usr/lib/x86_64-linux-gnu/libGLX.so /usr/lib/x86_64-linux-gnu/libOpenGL.so || libs/glad/libglad.a
+build Projekat: CXX_EXECUTABLE_LINKER__Projekat_Debug CMakeFiles/Projekat.dir/src/main.cpp.o CMakeFiles/Projekat.dir/src/Shader.cpp.o CMakeFiles/Projekat.dir/src/Camera.cpp.o | libs/glad/libglad.a /usr/lib/x86_64-linux-gnu/libGLX.so /usr/lib/x86_64-linux-gnu/libOpenGL.so || libs/glad/libglad.a
   FLAGS = -g
   LINK_LIBRARIES = -lglfw  libs/glad/libglad.a  -lXrandr  -lpthread  -lXi  -lX11  -ldl  /usr/lib/x86_64-linux-gnu/libGLX.so  /usr/lib/x86_64-linux-gnu/libOpenGL.so
   OBJECT_DIR = CMakeFiles/Projekat.dir
