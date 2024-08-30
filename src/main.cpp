@@ -17,6 +17,7 @@ void processInput(GLFWwindow* window);
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
 void mouse_callback(GLFWwindow* window, double xpos, double ypos);
 unsigned int loadTexture(const char *path);
+unsigned int ucitaj3DTeksturu(char const * path);
 
 // Window settings
 #define SCR_WIDTH (1280)
@@ -31,6 +32,9 @@ bool firstMouse = true;
 // Timing
 float deltaTime = 0.0f;
 float lastFrame = 0.0f;
+
+// Lighting
+glm::vec3 lightPos(1.2f, 1.0f, 2.0f);
 
 int main() {
     glfwInit();
@@ -64,21 +68,67 @@ int main() {
 
     glEnable(GL_DEPTH_TEST);
 
+    Shader lightCubeShader("shaders/lightCubeShader.vs", "shaders/lightCubeShader.fs");
     Shader floorShader("shaders/floorShader.vs", "shaders/floorShader.fs");
     Shader grassShader("shaders/grassShader.vs", "shaders/grassShader.fs");
 
-    float floorVertices[] = {
-            15.0f, -2.5f,  15.0f,  2.0f, 0.0f,
-            -15.0f, -2.5f,  15.0f,  0.0f, 0.0f,
-            -15.0f, -2.5f, -15.0f,  0.0f, 2.0f,
+    float lightCubeVertices[] = {
+            -0.5f, -0.5f, -0.5f,
+            0.5f, -0.5f, -0.5f,
+            0.5f,  0.5f, -0.5f,
+            0.5f,  0.5f, -0.5f,
+            -0.5f,  0.5f, -0.5f,
+            -0.5f, -0.5f, -0.5f,
 
-            15.0f, -2.5f,  15.0f,  2.0f, 0.0f,
-            -15.0f, -2.5f, -15.0f,  0.0f, 2.0f,
-            15.0f, -2.5f, -15.0f,  2.0f, 2.0f
+            -0.5f, -0.5f,  0.5f,
+            0.5f, -0.5f,  0.5f,
+            0.5f,  0.5f,  0.5f,
+            0.5f,  0.5f,  0.5f,
+            -0.5f,  0.5f,  0.5f,
+            -0.5f, -0.5f,  0.5f,
+
+            -0.5f,  0.5f,  0.5f,
+            -0.5f,  0.5f, -0.5f,
+            -0.5f, -0.5f, -0.5f,
+            -0.5f, -0.5f, -0.5f,
+            -0.5f, -0.5f,  0.5f,
+            -0.5f,  0.5f,  0.5f,
+
+            0.5f,  0.5f,  0.5f,
+            0.5f,  0.5f, -0.5f,
+            0.5f, -0.5f, -0.5f,
+            0.5f, -0.5f, -0.5f,
+            0.5f, -0.5f,  0.5f,
+            0.5f,  0.5f,  0.5f,
+
+            -0.5f, -0.5f, -0.5f,
+            0.5f, -0.5f, -0.5f,
+            0.5f, -0.5f,  0.5f,
+            0.5f, -0.5f,  0.5f,
+            -0.5f, -0.5f,  0.5f,
+            -0.5f, -0.5f, -0.5f,
+
+            -0.5f,  0.5f, -0.5f,
+            0.5f,  0.5f, -0.5f,
+            0.5f,  0.5f,  0.5f,
+            0.5f,  0.5f,  0.5f,
+            -0.5f,  0.5f,  0.5f,
+            -0.5f,  0.5f, -0.5f,
+    };
+
+    float floorVertices[] = {
+            // positions              // texture Coords     // Normal Coords
+            15.0f, -2.5f,  15.0f,       2.0f, 0.0f,         0.0f, 1.0f, 0.0f,
+            -15.0f, -2.5f,  15.0f,      0.0f, 0.0f,         0.0f, 1.0f, 0.0f,
+            -15.0f, -2.5f, -15.0f,      0.0f, 2.0f,         0.0f, 1.0f, 0.0f,
+
+            15.0f, -2.5f,  15.0f,       2.0f, 0.0f,         0.0f, 1.0f, 0.0f,
+            -15.0f, -2.5f, -15.0f,      0.0f, 2.0f,         0.0f, 1.0f, 0.0f,
+            15.0f, -2.5f, -15.0f,       2.0f, 2.0f,         0.0f, 1.0f, 0.0f
     };
 
     float grassVertices[] = {
-            // positions         // texture Coords (swapped y coordinates because texture is flipped upside down)
+            // positions         // texture Coords          // Normal Coords
             0.0f,  0.5f,  0.0f,     0.0f,  0.0f,
             0.0f, -0.5f,  0.0f,     0.0f,  1.0f,
             1.0f, -0.5f,  0.0f,     1.0f,  1.0f,
@@ -86,7 +136,29 @@ int main() {
             0.0f,  0.5f,  0.0f,     0.0f,  0.0f,
             1.0f, -0.5f,  0.0f,     1.0f,  1.0f,
             1.0f,  0.5f,  0.0f,     1.0f,  0.0f
+
+            // texture coords have swapped y coordinates because texture is flipped upside down
     };
+
+    // transparent vegetation locations
+    std::vector<glm::vec3> vegetation{
+            glm::vec3(-1.5f, -2.0f, -0.48f),
+            glm::vec3( 1.5f, -2.0f, 0.51f),
+            glm::vec3( 0.0f, -2.0f, 0.7f),
+            glm::vec3(-0.3f, -2.0f, -2.3f),
+            glm::vec3 (0.5f, -2.0f, -0.6f)
+
+    };
+
+    // light VAO
+    unsigned int lightCubeVAO, lightCubeVBO;
+    glGenVertexArrays(1, &lightCubeVAO);
+    glGenBuffers(1, &lightCubeVBO);
+    glBindVertexArray(lightCubeVAO);
+    glBindBuffer(GL_ARRAY_BUFFER, lightCubeVBO);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(lightCubeVertices), lightCubeVertices, GL_STATIC_DRAW);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+    glEnableVertexAttribArray(0);
 
     // floor VAO
     unsigned int floorVAO, floorVBO;
@@ -95,10 +167,12 @@ int main() {
     glBindVertexArray(floorVAO);
     glBindBuffer(GL_ARRAY_BUFFER, floorVBO);
     glBufferData(GL_ARRAY_BUFFER, sizeof(floorVertices), floorVertices, GL_STATIC_DRAW);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
-    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
+    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
     glEnableVertexAttribArray(1);
+    glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(5 * sizeof(float)));
+    glEnableVertexAttribArray(2);
 
     // grass VAO
     unsigned int grassVAO, grassVBO;
@@ -117,22 +191,15 @@ int main() {
     unsigned int floorTexture = loadTexture("textures/floor.png");
     unsigned int grassTexture = loadTexture("textures/grass.png");
 
-    // transparent vegetation locations
-    std::vector<glm::vec3> vegetation{
-        glm::vec3(-1.5f, -2.0f, -0.48f),
-        glm::vec3( 1.5f, -2.0f, 0.51f),
-        glm::vec3( 0.0f, -2.0f, 0.7f),
-        glm::vec3(-0.3f, -2.0f, -2.3f),
-        glm::vec3 (0.5f, -2.0f, -0.6f)
-
-    };
-
     // Shader configuration
     floorShader.use();
-    floorShader.setInt("floorTexture", 0);
+    floorShader.setInt("floorDiffuse", 0);
+    floorShader.setInt("floorSpecular", 1);
 
     grassShader.use();
     grassShader.setInt("grassTexture", 0);
+
+    // render loop
 
     while (!glfwWindowShouldClose(window)) {
         // per-frame time logic
@@ -147,9 +214,19 @@ int main() {
         glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+        // Activating shader when setting uniforms/drawing objects
         floorShader.use();
-        // floorShader.setVec3("objectColor", 1.0f, 0.5f, 0.31f);
-        // floorShader.setVec3("lightColor", 1.0f, 1.0f, 1.0f);
+        floorShader.setVec3("lightColor", 1.0f, 1.0f, 1.0f);
+        floorShader.setVec3("lightPos", lightPos);
+        floorShader.setVec3("viewPos", camera.Position);
+
+        // light properties
+        floorShader.setVec3("light.ambient", 0.2f, 0.2f, 0.2f);
+        floorShader.setVec3("light.diffuse", 0.5f, 0.5f, 0.5f);
+        floorShader.setVec3("light.specular", 1.0f, 1.0f, 1.0f);
+
+        // material properties
+        floorShader.setFloat("material.shininess", 64.0f);
 
         // View/projection transformations
         glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
@@ -157,15 +234,15 @@ int main() {
         floorShader.setMat4("projection", projection);
         floorShader.setMat4("view", view);
 
+        // World transofrmation
+        glm::mat4 model = glm::mat4(1.0f);
+        floorShader.setMat4("model", model);
 
+        // floor
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, floorTexture);
 
-        // floor
         glBindVertexArray(floorVAO);
-        glBindTexture(GL_TEXTURE_2D, floorTexture);
-        glm::mat4 model = glm::mat4(1.0f);
-        floorShader.setMat4("model", model);
         glDrawArrays(GL_TRIANGLES, 0, 6);
 
         // vegetation
@@ -186,6 +263,18 @@ int main() {
             grassShader.setMat4("model", model);
             glDrawArrays(GL_TRIANGLES, 0, 6);
         }
+
+        // Also draw the lamp object
+        lightCubeShader.use();
+        lightCubeShader.setMat4("projection", projection);
+        lightCubeShader.setMat4("view", view);
+        model = glm::mat4(1.0f);
+        model = glm::translate(model, lightPos);
+        model = glm::scale(model, glm::vec3(0.9f)); // a smaller cube
+        lightCubeShader.setMat4("model", model);
+
+        glBindVertexArray(lightCubeVAO);
+        glDrawArrays(GL_TRIANGLES, 0, 36);
 
         glfwSwapBuffers(window);
         glfwPollEvents();
