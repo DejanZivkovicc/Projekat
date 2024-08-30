@@ -19,8 +19,8 @@ void mouse_callback(GLFWwindow* window, double xpos, double ypos);
 unsigned int loadTexture(const char *path);
 
 // Window settings
-#define SCR_WIDTH (800)
-#define SCR_HEIGHT (600)
+#define SCR_WIDTH (1280)
+#define SCR_HEIGHT (800)
 
 // Camera settings
 Camera camera(glm::vec3(0.0f, 0.0f, 3.0f));
@@ -64,87 +64,75 @@ int main() {
 
     glEnable(GL_DEPTH_TEST);
 
-    Shader cubeShader("testShaders/cubeShader.vs", "testShaders/cubeShader.fs");
+    Shader floorShader("shaders/floorShader.vs", "shaders/floorShader.fs");
+    Shader grassShader("shaders/grassShader.vs", "shaders/grassShader.fs");
 
-    float vertices[] = {
-//            -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
-//            0.5f, -0.5f, -0.5f,   1.0f, 0.0f,
-//            0.5f,  0.5f, -0.5f,   1.0f, 1.0f,
-//            0.5f,  0.5f, -0.5f,   1.0f, 1.0f,
-//            -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
-//            -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
-//
-//            -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-//            0.5f, -0.5f,  0.5f,   1.0f, 0.0f,
-//            0.5f,  0.5f,  0.5f,   1.0f, 1.0f,
-//            0.5f,  0.5f,  0.5f,   1.0f, 1.0f,
-//            -0.5f,  0.5f,  0.5f,  0.0f, 1.0f,
-//            -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-//
-//            -0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-//            -0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-//            -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-//            -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-//            -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-//            -0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-//
-//            0.5f,  0.5f,  0.5f,   1.0f, 0.0f,
-//            0.5f,  0.5f, -0.5f,   1.0f, 1.0f,
-//            0.5f, -0.5f, -0.5f,   0.0f, 1.0f,
-//            0.5f, -0.5f, -0.5f,   0.0f, 1.0f,
-//            0.5f, -0.5f,  0.5f,   0.0f, 0.0f,
-//            0.5f,  0.5f,  0.5f,   1.0f, 0.0f,
-//
-//            -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-//            0.5f, -0.5f, -0.5f,   1.0f, 1.0f,
-//            0.5f, -0.5f,  0.5f,   1.0f, 0.0f,
-//            0.5f, -0.5f,  0.5f,   1.0f, 0.0f,
-//            -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-//            -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-//
-//            -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
-//            0.5f,  0.5f, -0.5f,   1.0f, 1.0f,
-//            0.5f,  0.5f,  0.5f,   1.0f, 0.0f,
-//            0.5f,  0.5f,  0.5f,   1.0f, 0.0f,
-//            -0.5f,  0.5f,  0.5f,  0.0f, 0.0f,
-//            -0.5f,  0.5f, -0.5f,  0.0f, 1.0f
-            15.0f, -0.5f,  15.0f,  2.0f, 0.0f,
-            -15.0f, -0.5f,  15.0f,  0.0f, 0.0f,
-            -15.0f, -0.5f, -15.0f,  0.0f, 2.0f,
+    float floorVertices[] = {
+            15.0f, -2.5f,  15.0f,  2.0f, 0.0f,
+            -15.0f, -2.5f,  15.0f,  0.0f, 0.0f,
+            -15.0f, -2.5f, -15.0f,  0.0f, 2.0f,
 
-            15.0f, -0.5f,  15.0f,  2.0f, 0.0f,
-            -15.0f, -0.5f, -15.0f,  0.0f, 2.0f,
-            15.0f, -0.5f, -15.0f,  2.0f, 2.0f
+            15.0f, -2.5f,  15.0f,  2.0f, 0.0f,
+            -15.0f, -2.5f, -15.0f,  0.0f, 2.0f,
+            15.0f, -2.5f, -15.0f,  2.0f, 2.0f
     };
 
-    glm::vec3 cubePositions[] = {
-            glm::vec3(0.0f, -4.0f, -2.0f),
-            glm::vec3(2.0f, -4.0f, -2.0f),
-            glm::vec3(4.0f, -4.0f, -2.0f),
+    float grassVertices[] = {
+            // positions         // texture Coords (swapped y coordinates because texture is flipped upside down)
+            0.0f,  0.5f,  0.0f,     0.0f,  0.0f,
+            0.0f, -0.5f,  0.0f,     0.0f,  1.0f,
+            1.0f, -0.5f,  0.0f,     1.0f,  1.0f,
 
-            glm::vec3(0.0f, -4.0f, -4.0f),
-            glm::vec3(2.0f, -4.0f, -4.0f),
-            glm::vec3(4.0f, -4.0f, -4.0f),
-
-            glm::vec3(0.0f, -4.0f, -6.0f),
-            glm::vec3(2.0f, -4.0f, -6.0f),
-            glm::vec3(4.0f, -4.0f, -6.0f)
+            0.0f,  0.5f,  0.0f,     0.0f,  0.0f,
+            1.0f, -0.5f,  0.0f,     1.0f,  1.0f,
+            1.0f,  0.5f,  0.0f,     1.0f,  0.0f
     };
 
-    unsigned int cubeVAO, VBO;
-    glGenVertexArrays(1, &cubeVAO);
-    glGenBuffers(1, &VBO);
-    glBindVertexArray(cubeVAO);
-    glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+    // floor VAO
+    unsigned int floorVAO, floorVBO;
+    glGenVertexArrays(1, &floorVAO);
+    glGenBuffers(1, &floorVBO);
+    glBindVertexArray(floorVAO);
+    glBindBuffer(GL_ARRAY_BUFFER, floorVBO);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(floorVertices), floorVertices, GL_STATIC_DRAW);
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
     glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
     glEnableVertexAttribArray(1);
 
+    // grass VAO
+    unsigned int grassVAO, grassVBO;
+    glGenVertexArrays(1, &grassVAO);
+    glGenBuffers(1, &grassVBO);
+    glBindVertexArray(grassVAO);
+    glBindBuffer(GL_ARRAY_BUFFER, grassVBO);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(grassVertices), grassVertices, GL_STATIC_DRAW);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
+    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
+    glEnableVertexAttribArray(1);
+    glBindVertexArray(0);
+
+    // load textures
+    unsigned int floorTexture = loadTexture("textures/floor.png");
     unsigned int grassTexture = loadTexture("textures/grass.png");
-    cubeShader.use();
-    cubeShader.setInt("grassTexture", 0);
+
+    // transparent vegetation locations
+    std::vector<glm::vec3> vegetation{
+        glm::vec3(-1.5f, -2.0f, -0.48f),
+        glm::vec3( 1.5f, -2.0f, 0.51f),
+        glm::vec3( 0.0f, -2.0f, 0.7f),
+        glm::vec3(-0.3f, -2.0f, -2.3f),
+        glm::vec3 (0.5f, -2.0f, -0.6f)
+
+    };
+
+    // Shader configuration
+    floorShader.use();
+    floorShader.setInt("floorTexture", 0);
+
+    grassShader.use();
+    grassShader.setInt("grassTexture", 0);
 
     while (!glfwWindowShouldClose(window)) {
         // per-frame time logic
@@ -159,49 +147,52 @@ int main() {
         glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        cubeShader.use();
-        cubeShader.setVec3("objectColor", 1.0f, 0.5f, 0.31f);
-        cubeShader.setVec3("lightColor", 1.0f, 1.0f, 1.0f);
+        floorShader.use();
+        // floorShader.setVec3("objectColor", 1.0f, 0.5f, 0.31f);
+        // floorShader.setVec3("lightColor", 1.0f, 1.0f, 1.0f);
 
         // View/projection transformations
         glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
         glm::mat4 view = camera.GetViewMatrix();
-        cubeShader.setMat4("projection", projection);
-        cubeShader.setMat4("view", view);
+        floorShader.setMat4("projection", projection);
+        floorShader.setMat4("view", view);
 
-//        // World transformation
-//        glm::mat4 model = glm::mat4(1.0f);
-//        // model = glm::translate(model, glm::vec3(0.0f, -3.0f, 0.0f));
-//        cubeShader.setMat4("model", model);
+
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, floorTexture);
+
+        // floor
+        glBindVertexArray(floorVAO);
+        glBindTexture(GL_TEXTURE_2D, floorTexture);
+        glm::mat4 model = glm::mat4(1.0f);
+        floorShader.setMat4("model", model);
+        glDrawArrays(GL_TRIANGLES, 0, 6);
+
+        // vegetation
+        grassShader.use();
+
+        projection = glm::perspective(glm::radians(camera.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
+        view = camera.GetViewMatrix();
+        grassShader.setMat4("projection", projection);
+        grassShader.setMat4("view", view);
 
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, grassTexture);
+        glBindVertexArray(grassVAO);
 
-        glBindVertexArray(cubeVAO);
-//        for(unsigned int i = 0; i < 9; i++){
-//            // Calculate the model matrix for each object and pass it to shader before drawing
-//            glm::mat4 model = glm::mat4(1.0);
-//
-//            model = glm::translate(model, cubePositions[i]);
-//            model = glm::scale(model, glm::vec3(2.0f));
-//
-//            cubeShader.setMat4("model", model);
-//            glDrawArrays(GL_TRIANGLES, 0, 36);
-//        }
-        // floor
-        glBindVertexArray(cubeVAO);
-        glBindTexture(GL_TEXTURE_2D, grassTexture);
-        glm::mat4 model = glm::mat4(1.0f);
-        cubeShader.setMat4("model", model);
-        glDrawArrays(GL_TRIANGLES, 0, 6);
-
+        for (unsigned int i = 0; i < vegetation.size(); i++){
+            model = glm::mat4(1.0f);
+            model = glm::translate(model, vegetation[i]);
+            grassShader.setMat4("model", model);
+            glDrawArrays(GL_TRIANGLES, 0, 6);
+        }
 
         glfwSwapBuffers(window);
         glfwPollEvents();
     }
 
-    glDeleteVertexArrays(1, &cubeVAO);
-    glDeleteBuffers(1, &VBO);
+    glDeleteVertexArrays(1, &floorVAO);
+    glDeleteBuffers(1, &floorVBO);
     glfwTerminate();
 
     return 0;
@@ -259,15 +250,13 @@ void scroll_callback(GLFWwindow* window, double xoffset, double yoffset){
 
 // utility function for loading a 2D texture from file
 // ---------------------------------------------------
-unsigned int loadTexture(char const * path)
-{
+unsigned int loadTexture(char const * path){
     unsigned int textureID;
     glGenTextures(1, &textureID);
 
     int width, height, nrComponents;
     unsigned char *data = stbi_load(path, &width, &height, &nrComponents, 0);
-    if (data)
-    {
+    if (data){
         GLenum format;
         if (nrComponents == 1)
             format = GL_RED;
@@ -287,8 +276,7 @@ unsigned int loadTexture(char const * path)
 
         stbi_image_free(data);
     }
-    else
-    {
+    else{
         std::cout << "Texture failed to load at path: " << path << std::endl;
         stbi_image_free(data);
     }
