@@ -38,13 +38,17 @@ float lastFrame = 0.0f;
 glm::vec3 lightPos(1.2f, 1.0f, 6.0f);
 
 glm::vec3 lightPos1(1.2f, 1.0f, 6.0f);
-glm::vec3 lightPos2(1.8f, 0.5f, -3.2);
+glm::vec3 lightPos2(1.6f, 0.5f, -3.2);
+
+// Sphere color
+glm::vec3 sphereColor(1.0f, 1.0f, 1.0f);
 
 int main() {
     glfwInit();
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+    glfwWindowHint(GLFW_SAMPLES, 4);
 
 #ifdef __APPLE__
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
@@ -71,6 +75,7 @@ int main() {
     }
 
     glEnable(GL_DEPTH_TEST);
+    glEnable(GL_MULTISAMPLE);
 
     Shader lightCubeShader("shaders/lightCubeShader.vs", "shaders/lightCubeShader.fs");
     Shader floorShader("shaders/floorShader.vs", "shaders/floorShader.fs");
@@ -399,6 +404,7 @@ int main() {
         view = camera.GetViewMatrix();
         projection = glm::perspective(glm::radians(camera.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
 
+        sphereShader.setVec3("sphereColor", sphereColor);
         sphereShader.setMat4("model", model);
         sphereShader.setMat4("view", view);
         sphereShader.setMat4("projection", projection);
@@ -463,6 +469,15 @@ void processInput(GLFWwindow *window){
         camera.ProcessKeyboard(LEFT, deltaTime);
     if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
         camera.ProcessKeyboard(RIGHT, deltaTime);
+
+
+    // Pendulum color change
+    if (glfwGetKey(window, GLFW_KEY_1) == GLFW_PRESS) {
+        sphereColor = glm::vec3(1.0f, 1.0f, 1.0f); // Bela boja
+    }
+    if (glfwGetKey(window, GLFW_KEY_2) == GLFW_PRESS) {
+        sphereColor = glm::vec3(1.0f, 0.0f, 0.0f); // Crvena boja
+    }
 }
 
 // glfw: whenever the window size changed (by OS or user resize) this callback function executes
