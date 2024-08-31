@@ -38,7 +38,7 @@ float lastFrame = 0.0f;
 // Lighting
 glm::vec3 lightPos(1.2f, 1.0f, 6.0f);
 
-glm::vec3 lightPos1(1.2f, 6.0f, 6.0f);
+glm::vec3 lightPos1(1.2f, 3.0f, 6.0f);
 glm::vec3 lightPos2(1.6f, 0.5f, -3.2);
 
 // Sphere color
@@ -184,6 +184,12 @@ int main() {
             glm::vec3(-2.3f, -2.0f, -7.3f),
             glm::vec3 (5.5f, -2.0f, -5.6f)
 
+    };
+
+    // transparent vegetation locations
+    std::vector<glm::vec3> trees{
+            glm::vec3(6.0f, -2.5f, -2.0f),
+            glm::vec3( -6.5f, 0.0f, -7.51f)
     };
 
     // light VAO
@@ -348,14 +354,16 @@ int main() {
 
         // render the loaded model
         model = glm::mat4(1.0f);
-        model = glm::translate(model, glm::vec3(6.0f, -2.5f, -2.0f)); // translate it down so it's at the center of the scene
-        model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f));	// it's a bit too big for our scene, so scale it down
-        treeModelShader.setMat4("model", model);
-        treeModel.Draw(treeModelShader);
+        for(int i = 0; i < trees.size(); i++) {
+            model = glm::translate(model, trees[i]); // translate it down so it's at the center of the scene
+            model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f));    // it's a bit too big for our scene, so scale it down
+            treeModelShader.setMat4("model", model);
+            treeModel.Draw(treeModelShader);
+        }
 
         // --------------------------------soad--------------------------------
         soadShader.use();
-        soadShader.setVec3("light.position", lightPos);
+        soadShader.setVec3("light.position", lightPos1);
         soadShader.setVec3("viewPos", camera.Position);
 
         // light properties
@@ -452,7 +460,7 @@ int main() {
         lightCubeShader.setMat4("projection", projection);
         lightCubeShader.setMat4("view", view);
         model = glm::mat4(1.0f);
-        model = glm::translate(model, lightPos);
+        model = glm::translate(model, lightPos1);
         model = glm::scale(model, glm::vec3(1.2f)); // a smaller cube
         lightCubeShader.setMat4("model", model);
 
