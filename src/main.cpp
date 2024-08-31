@@ -38,8 +38,8 @@ float lastFrame = 0.0f;
 // Lighting
 glm::vec3 lightPos(1.2f, 1.0f, 6.0f);
 
-glm::vec3 lightPos1(1.2f, 3.0f, 6.0f);
-glm::vec3 lightPos2(1.6f, 0.5f, -3.2);
+glm::vec3 lightPos1(-4.2f, 3.0f, 10.0f);
+glm::vec3 lightPos2(1.65f, 0.0f, -3.2);
 
 // Sphere color
 glm::vec3 sphereColor(1.0f, 1.0f, 1.0f);
@@ -84,9 +84,11 @@ int main() {
     Shader soadShader("shaders/soadShader.vs", "shaders/soadShader.fs");
     Shader blackBackgroundShader("shaders/blackBackground.vs", "shaders/blackBackground.fs");
     Shader sphereShader("shaders/sphereShader.vs", "shaders/sphereShader.fs");
-    Shader treeModelShader("shaders/modelShader.vs", "shaders/modelShader.fs");
+    Shader modelShader("shaders/modelShader.vs", "shaders/modelShader.fs");
 
     Model treeModel("models/objects/Tree 02/Tree.obj");
+    Model cottageModel("models/objects/SpookyManor/Manor.obj");
+    Model streetLampModel("models/objects/Street lamp/Street lamp.obj");
 
     float lightCubeVertices[] = {
             -0.5f, -0.5f, -0.5f,
@@ -182,14 +184,19 @@ int main() {
             glm::vec3( 1.5f, -2.0f, 0.51f),
             glm::vec3( 6.0f, -2.0f, 3.7f),
             glm::vec3(-2.3f, -2.0f, -7.3f),
-            glm::vec3 (5.5f, -2.0f, -5.6f)
-
+            glm::vec3 (5.5f, -2.0f, -5.6f),
+            glm::vec3 (2.5f, -2.0f, 5.6f),
+            glm::vec3 (3.7f, -2.0f, -3.6f),
+            glm::vec3 (-1.8f, -2.0f, 2.6f),
+            glm::vec3 (-5.0f, -2.0f, -9.6f),
+            glm::vec3 (0.0f, -2.0f, 0.0f)
     };
 
     // transparent vegetation locations
     std::vector<glm::vec3> trees{
             glm::vec3(6.0f, -2.5f, -2.0f),
-            glm::vec3( -6.5f, 0.0f, -7.51f)
+            glm::vec3( -6.5f, 0.0f, -7.51f),
+            glm::vec3( -10.5f, 0.0f, 5.01f)
     };
 
     // light VAO
@@ -357,9 +364,27 @@ int main() {
         for(int i = 0; i < trees.size(); i++) {
             model = glm::translate(model, trees[i]); // translate it down so it's at the center of the scene
             model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f));    // it's a bit too big for our scene, so scale it down
-            treeModelShader.setMat4("model", model);
-            treeModel.Draw(treeModelShader);
+            modelShader.setMat4("model", model);
+            treeModel.Draw(modelShader);
         }
+
+        // --------------------------------cottageModel--------------------------------
+
+        // render the loaded model
+        model = glm::mat4(1.0f);
+        model = glm::translate(model, glm::vec3(-7.0f, -2.5f, -10.0f)); // translate it down so it's at the center of the scene
+        model = glm::scale(model, glm::vec3(4.0f));    // it's a bit too big for our scene, so scale it down
+        modelShader.setMat4("model", model);
+        cottageModel.Draw(modelShader);
+
+        // --------------------------------streetLampModel--------------------------------
+//        glm::vec3( -10.5f, 0.0f, 5.01f)
+        // render the loaded model
+        model = glm::mat4(1.0f);
+        model = glm::translate(model, glm::vec3(-3.93f)); // translate it down so it's at the center of the scene
+        model = glm::scale(model, glm::vec3(0.2f));    // it's a bit too big for our scene, so scale it down
+        modelShader.setMat4("model", model);
+        streetLampModel.Draw(modelShader);
 
         // --------------------------------soad--------------------------------
         soadShader.use();
@@ -419,8 +444,8 @@ int main() {
         model = glm::mat4(1.0f);
         model = glm::translate(model, glm::vec3(x, y, -3.0f));
 //        model = glm::translate(model, lightPos);
-        model = glm::translate(model, lightPos2);
-        model = glm::scale(model, glm::vec3(0.2f)); // a smaller cube
+        model = glm::translate(model, lightPos1);
+        model = glm::scale(model, glm::vec3(1.0f)); // a smaller cube
 
         view = camera.GetViewMatrix();
         projection = glm::perspective(glm::radians(camera.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
@@ -460,8 +485,8 @@ int main() {
         lightCubeShader.setMat4("projection", projection);
         lightCubeShader.setMat4("view", view);
         model = glm::mat4(1.0f);
-        model = glm::translate(model, lightPos1);
-        model = glm::scale(model, glm::vec3(1.2f)); // a smaller cube
+        model = glm::translate(model, glm::vec3(-3.93, 0.0,-3.93f));
+        model = glm::scale(model, glm::vec3(0.15f)); // a smaller cube
         lightCubeShader.setMat4("model", model);
 
         glBindVertexArray(lightCubeVAO);
