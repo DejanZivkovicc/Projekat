@@ -11,13 +11,14 @@
 
 #include <iostream>
 #include <vector>
+#include <cmath>
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void processInput(GLFWwindow* window);
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
 void mouse_callback(GLFWwindow* window, double xpos, double ypos);
 unsigned int loadTexture(const char *path);
-unsigned int ucitaj3DTeksturu(char const * path);
+std::vector<float> generateSphereVertices(float radius, unsigned int sectors, unsigned int stacks);
 
 // Window settings
 #define SCR_WIDTH (1280)
@@ -34,7 +35,7 @@ float deltaTime = 0.0f;
 float lastFrame = 0.0f;
 
 // Lighting
-glm::vec3 lightPos(1.2f, 1.0f, 2.0f);
+glm::vec3 lightPos(1.2f, 1.0f, 6.0f);
 
 int main() {
     glfwInit();
@@ -71,6 +72,9 @@ int main() {
     Shader lightCubeShader("shaders/lightCubeShader.vs", "shaders/lightCubeShader.fs");
     Shader floorShader("shaders/floorShader.vs", "shaders/floorShader.fs");
     Shader grassShader("shaders/grassShader.vs", "shaders/grassShader.fs");
+//    Shader sphereShader("testShaders/triangleShader.vs", "testShaders/triangleShader.fs");
+    Shader soadShader("shaders/soadShader.vs", "shaders/soadShader.fs");
+    Shader blackBackgroundShader("shaders/blackBackground.vs", "shaders/blackBackground.fs");
 
     float lightCubeVertices[] = {
             -0.5f, -0.5f, -0.5f,
@@ -127,6 +131,34 @@ int main() {
             15.0f, -2.5f, -15.0f,       2.0f, 2.0f,         0.0f, 1.0f, 0.0f
     };
 
+    float soadVertices[] = {
+            // Positions            // texture coords
+//            -0.5f, -0.5f, 0.5f,      0.0f,  1.0f,
+//            0.5f, -0.5f, 0.5f,       1.0f,  1.0f,
+//            0.5f, 0.5f, 0.5f,        1.0f,  0.0f,
+//
+//            0.5f, 0.5f, 0.5f,        1.0f,  0.0f,
+//            -0.5f, 0.5f, 0.5f,       0.0f,  0.0f,
+//            -0.5f, -0.5f, 0.5f,      0.0f,  1.0f,
+            0.0f,  0.5f,  0.0f,     0.0f,  0.0f,        0.0f, 1.0f, 0.0f,
+            0.0f, -0.5f,  0.0f,     0.0f,  1.0f,        0.0f, 1.0f, 0.0f,
+            1.0f, -0.5f,  0.0f,     1.0f,  1.0f,        0.0f, 1.0f, 0.0f,
+
+            0.0f,  0.5f,  0.0f,     0.0f,  0.0f,        0.0f, 1.0f, 0.0f,
+            1.0f, -0.5f,  0.0f,     1.0f,  1.0f,        0.0f, 1.0f, 0.0f,
+            1.0f,  0.5f,  0.0f,     1.0f,  0.0f,        0.0f, 1.0f, 0.0f
+    };
+
+    float blackBackgroundVertices[] = {
+            0.0f,  0.5f,  0.0f,
+            0.0f, -0.5f,  0.0f,
+            1.0f, -0.5f,  0.0f,
+
+            0.0f,  0.5f,  0.0f,
+            1.0f, -0.5f,  0.0f,
+            1.0f,  0.5f,  0.0f
+    };
+
     float grassVertices[] = {
             // positions         // texture Coords          // Normal Coords
             0.0f,  0.5f,  0.0f,     0.0f,  0.0f,
@@ -142,11 +174,11 @@ int main() {
 
     // transparent vegetation locations
     std::vector<glm::vec3> vegetation{
-            glm::vec3(-1.5f, -2.0f, -0.48f),
+            glm::vec3(-1.5f, -2.0f, -4.48f),
             glm::vec3( 1.5f, -2.0f, 0.51f),
-            glm::vec3( 0.0f, -2.0f, 0.7f),
-            glm::vec3(-0.3f, -2.0f, -2.3f),
-            glm::vec3 (0.5f, -2.0f, -0.6f)
+            glm::vec3( 6.0f, -2.0f, 3.7f),
+            glm::vec3(-2.3f, -2.0f, -7.3f),
+            glm::vec3 (5.5f, -2.0f, -5.6f)
 
     };
 
@@ -159,6 +191,21 @@ int main() {
     glBufferData(GL_ARRAY_BUFFER, sizeof(lightCubeVertices), lightCubeVertices, GL_STATIC_DRAW);
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
+
+    // sphere VAO
+    unsigned int sphereVAO, sphereVBO;
+
+    // Generating sphere vertex
+//    std::vector<float> sphereVertices = generateSphereVertices(1.0f, 36, 18); // Poluprečnik 1.0, 36 sektora i 18 slojeva
+//    glGenVertexArrays(1, &sphereVAO);
+//    glGenBuffers(1, &sphereVBO);
+//    glBindVertexArray(sphereVAO);
+//
+//    glBindBuffer(GL_ARRAY_BUFFER, sphereVBO);
+//    glBufferData(GL_ARRAY_BUFFER, sphereVertices.size() * sizeof(float), &sphereVertices[0], GL_STATIC_DRAW);
+//    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+//    glEnableVertexAttribArray(0);
+
 
     // floor VAO
     unsigned int floorVAO, floorVBO;
@@ -173,6 +220,29 @@ int main() {
     glEnableVertexAttribArray(1);
     glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(5 * sizeof(float)));
     glEnableVertexAttribArray(2);
+
+    // soad VAO
+    unsigned int soadVAO, soadVBO;
+    glGenVertexArrays(1, &soadVAO);
+    glGenBuffers(1, &soadVBO);
+      glBindVertexArray(soadVAO);
+    glBindBuffer(GL_ARRAY_BUFFER, soadVBO);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(soadVertices), soadVertices, GL_STATIC_DRAW);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
+    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
+    glEnableVertexAttribArray(1);
+    glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(5 * sizeof(float)));
+    glEnableVertexAttribArray(2);
+
+    unsigned int blackBackgroundVAO, blackBackgroundVBO;
+    glGenVertexArrays(1, &blackBackgroundVAO);
+    glGenBuffers(1, &blackBackgroundVBO);
+    glBindVertexArray(blackBackgroundVAO);
+    glBindBuffer(GL_ARRAY_BUFFER, blackBackgroundVBO);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(blackBackgroundVertices), blackBackgroundVertices, GL_STATIC_DRAW);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+    glEnableVertexAttribArray(0);
 
     // grass VAO
     unsigned int grassVAO, grassVBO;
@@ -190,17 +260,23 @@ int main() {
     // load textures
     unsigned int floorTexture = loadTexture("textures/floor.png");
     unsigned int grassTexture = loadTexture("textures/grass.png");
+    unsigned int soadTexture = loadTexture("textures/soad.jpg");
 
     // Shader configuration
     floorShader.use();
-    floorShader.setInt("floorDiffuse", 0);
-    floorShader.setInt("floorSpecular", 1);
+    floorShader.setInt("material.diffuse", 0);
+    floorShader.setInt("material.specular", 1);
+
+    soadShader.use();
+    soadShader.setInt("material.diffuse", 0);
+    soadShader.setInt("material.specular", 1);
 
     grassShader.use();
     grassShader.setInt("grassTexture", 0);
 
     // render loop
 
+    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
     while (!glfwWindowShouldClose(window)) {
         // per-frame time logic
         float currentFrame = static_cast<float>(glfwGetTime());
@@ -216,8 +292,8 @@ int main() {
 
         // Activating shader when setting uniforms/drawing objects
         floorShader.use();
-        floorShader.setVec3("lightColor", 1.0f, 1.0f, 1.0f);
-        floorShader.setVec3("lightPos", lightPos);
+//        floorShader.setVec3("lightColor", 1.0f, 1.0f, 1.0f);
+        floorShader.setVec3("light.position", lightPos);
         floorShader.setVec3("viewPos", camera.Position);
 
         // light properties
@@ -245,6 +321,49 @@ int main() {
         glBindVertexArray(floorVAO);
         glDrawArrays(GL_TRIANGLES, 0, 6);
 
+        // soad
+        soadShader.use();
+        soadShader.setVec3("light.position", lightPos);
+        soadShader.setVec3("viewPos", camera.Position);
+
+        // light properties
+        soadShader.setVec3("light.ambient", 0.2f, 0.2f, 0.2f);
+        soadShader.setVec3("light.diffuse", 0.5f, 0.5f, 0.5f);
+        soadShader.setVec3("light.specular", 1.0f, 1.0f, 1.0f);
+
+        // material properties
+        soadShader.setFloat("material.shininess", 64.0f);
+
+        projection = glm::perspective(glm::radians(camera.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
+        view = camera.GetViewMatrix();
+        soadShader.setMat4("projection", projection);
+        soadShader.setMat4("view", view);
+
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, soadTexture);
+        glBindVertexArray(soadVAO);
+
+        model = glm::mat4(1.0f);
+        model = glm::scale(model, glm::vec3(3.2f, 4.0f, 3.2f)); // a smaller cube
+        model = glm::translate(model, glm::vec3(0.0f, -0.1f, -2.0));
+        soadShader.setMat4("model", model);
+
+        glDrawArrays(GL_TRIANGLES, 0, 6);
+
+        // black background
+        blackBackgroundShader.use();
+        blackBackgroundShader.setMat4("projection", projection);
+        blackBackgroundShader.setMat4("view", view);
+        model = glm::mat4(1.0f);
+        model = glm::scale(model, glm::vec3(3.2f, 4.0f, 3.2f)); // a smaller cube
+        model = glm::translate(model, glm::vec3(0.0f, -0.1f, -2.01));
+//        model = glm::translate(model, lightPos);
+//        model = glm::scale(model, glm::vec3(1.0f)); // a smaller cube
+        lightCubeShader.setMat4("model", model);
+
+        glBindVertexArray(blackBackgroundVAO);
+        glDrawArrays(GL_TRIANGLES, 0, 36);
+
         // vegetation
         grassShader.use();
 
@@ -270,11 +389,29 @@ int main() {
         lightCubeShader.setMat4("view", view);
         model = glm::mat4(1.0f);
         model = glm::translate(model, lightPos);
-        model = glm::scale(model, glm::vec3(0.9f)); // a smaller cube
+        model = glm::scale(model, glm::vec3(1.2f)); // a smaller cube
         lightCubeShader.setMat4("model", model);
 
         glBindVertexArray(lightCubeVAO);
         glDrawArrays(GL_TRIANGLES, 0, 36);
+
+
+        // Sphere
+//        sphereShader.use();
+//        model = glm::mat4(1.0f);
+//        view = camera.GetViewMatrix();
+//        projection = glm::perspective(glm::radians(camera.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
+//
+//        sphereShader.setMat4("model", model);
+//        sphereShader.setMat4("view", view);
+//        sphereShader.setMat4("projection", projection);
+//
+//
+//        // Renderovanje sfere
+//        glBindVertexArray(sphereVAO);
+//        glPolygonMode(GL_FRONT_AND_BACK, GL_FILL); // Renderuje punu površinu
+//        glDrawArrays(GL_TRIANGLE_STRIP, 0, sphereVertices.size() / 3);
+
 
         glfwSwapBuffers(window);
         glfwPollEvents();
@@ -371,4 +508,33 @@ unsigned int loadTexture(char const * path){
     }
 
     return textureID;
+}
+
+// Funkcija za generisanje verteksa sfere
+std::vector<float> generateSphereVertices(float radius, unsigned int sectors, unsigned int stacks) {
+    std::vector<float> vertices;
+
+    float x, y, z, xy;                          // pozicije verteksa
+    float sectorStep = 2 * M_PI / sectors;      // ugao po longitudinalnoj liniji
+    float stackStep = M_PI / stacks;            // ugao po latitudinalnoj liniji
+    float sectorAngle, stackAngle;
+
+    for(unsigned int i = 0; i <= stacks; ++i) {
+        stackAngle = M_PI / 2 - i * stackStep;        // počevši od pi/2 do -pi/2
+        xy = radius * cosf(stackAngle);             // radijus * kosinus od latituda
+        z = radius * sinf(stackAngle);              // radijus * sinus od latituda
+
+        for(unsigned int j = 0; j <= sectors; ++j) {
+            sectorAngle = j * sectorStep;           // longitudinalni ugao
+
+            // pozicije verteksa
+            x = xy * cosf(sectorAngle);             // x = r * cos(u) * cos(v)
+            y = xy * sinf(sectorAngle);             // y = r * cos(u) * sin(v)
+            vertices.push_back(x);
+            vertices.push_back(y);
+            vertices.push_back(z);
+        }
+    }
+
+    return vertices;
 }
