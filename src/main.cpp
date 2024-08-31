@@ -72,9 +72,9 @@ int main() {
     Shader lightCubeShader("shaders/lightCubeShader.vs", "shaders/lightCubeShader.fs");
     Shader floorShader("shaders/floorShader.vs", "shaders/floorShader.fs");
     Shader grassShader("shaders/grassShader.vs", "shaders/grassShader.fs");
-//    Shader sphereShader("testShaders/triangleShader.vs", "testShaders/triangleShader.fs");
     Shader soadShader("shaders/soadShader.vs", "shaders/soadShader.fs");
     Shader blackBackgroundShader("shaders/blackBackground.vs", "shaders/blackBackground.fs");
+    Shader sphereShader("shaders/sphereShader.vs", "shaders/sphereShader.fs");
 
     float lightCubeVertices[] = {
             -0.5f, -0.5f, -0.5f,
@@ -192,21 +192,6 @@ int main() {
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
 
-    // sphere VAO
-    unsigned int sphereVAO, sphereVBO;
-
-    // Generating sphere vertex
-//    std::vector<float> sphereVertices = generateSphereVertices(1.0f, 36, 18); // Poluprečnik 1.0, 36 sektora i 18 slojeva
-//    glGenVertexArrays(1, &sphereVAO);
-//    glGenBuffers(1, &sphereVBO);
-//    glBindVertexArray(sphereVAO);
-//
-//    glBindBuffer(GL_ARRAY_BUFFER, sphereVBO);
-//    glBufferData(GL_ARRAY_BUFFER, sphereVertices.size() * sizeof(float), &sphereVertices[0], GL_STATIC_DRAW);
-//    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
-//    glEnableVertexAttribArray(0);
-
-
     // floor VAO
     unsigned int floorVAO, floorVBO;
     glGenVertexArrays(1, &floorVAO);
@@ -235,6 +220,7 @@ int main() {
     glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(5 * sizeof(float)));
     glEnableVertexAttribArray(2);
 
+    // blackBackground VAO
     unsigned int blackBackgroundVAO, blackBackgroundVBO;
     glGenVertexArrays(1, &blackBackgroundVAO);
     glGenBuffers(1, &blackBackgroundVBO);
@@ -243,6 +229,20 @@ int main() {
     glBufferData(GL_ARRAY_BUFFER, sizeof(blackBackgroundVertices), blackBackgroundVertices, GL_STATIC_DRAW);
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
+
+    // sphere VAO
+    unsigned int sphereVAO, sphereVBO;
+    glGenVertexArrays(1, &sphereVAO);
+    glGenBuffers(1, &sphereVBO);
+    glBindVertexArray(sphereVAO);
+
+    std::vector<float> sphereVertices = generateSphereVertices(1.0f, 36, 18); // Poluprečnik 1.0, 36 sektora i 18 slojeva
+    glBindBuffer(GL_ARRAY_BUFFER, sphereVBO);
+    glBufferData(GL_ARRAY_BUFFER, sphereVertices.size() * sizeof(float), &sphereVertices[0], GL_STATIC_DRAW);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
+    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
+    glEnableVertexAttribArray(1);
 
     // grass VAO
     unsigned int grassVAO, grassVBO;
@@ -261,6 +261,7 @@ int main() {
     unsigned int floorTexture = loadTexture("textures/floor.png");
     unsigned int grassTexture = loadTexture("textures/grass.png");
     unsigned int soadTexture = loadTexture("textures/soad.jpg");
+    unsigned int sphereTexture = loadTexture("textures/glass.jpg");
 
     // Shader configuration
     floorShader.use();
@@ -271,12 +272,16 @@ int main() {
     soadShader.setInt("material.diffuse", 0);
     soadShader.setInt("material.specular", 1);
 
+    sphereShader.use();
+    sphereShader.setInt("sphereTexture", 0);
+
     grassShader.use();
     grassShader.setInt("grassTexture", 0);
 
     // render loop
 
     glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+
     while (!glfwWindowShouldClose(window)) {
         // per-frame time logic
         float currentFrame = static_cast<float>(glfwGetTime());
@@ -364,9 +369,42 @@ int main() {
         glBindVertexArray(blackBackgroundVAO);
         glDrawArrays(GL_TRIANGLES, 0, 36);
 
+        // Sphere
+        // Ažuriranje vremena
+        float time = glfwGetTime();
+        float speed = 2.0f; // brzina oscilacije
+
+        // Izračunavanje translacije
+        float x = sin(time * speed) * 2.0f; // oscilacija levo-desno
+        float y = abs(cos(time * speed)) * (-2.0f); // oscilacija gore-dole
+
+        // Transformacija
+        sphereShader.use();
+
+        model = glm::mat4(1.0f);
+        model = glm::translate(model, glm::vec3(x, y, -3.0f));
+//        model = glm::translate(model, lightPos);
+        model = glm::translate(model, glm::vec3(1.8f, 0.5f, -3.2));
+        model = glm::scale(model, glm::vec3(0.2f)); // a smaller cube
+
+        view = camera.GetViewMatrix();
+        projection = glm::perspective(glm::radians(camera.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
+
+        sphereShader.setMat4("model", model);
+        sphereShader.setMat4("view", view);
+        sphereShader.setMat4("projection", projection);
+
+        // Renderovanje
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, sphereTexture);
+
+        glBindVertexArray(sphereVAO);
+        glDrawArrays(GL_TRIANGLE_STRIP, 0, sphereVertices.size() / 3);
+
+
+
         // vegetation
         grassShader.use();
-
         projection = glm::perspective(glm::radians(camera.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
         view = camera.GetViewMatrix();
         grassShader.setMat4("projection", projection);
@@ -383,7 +421,7 @@ int main() {
             glDrawArrays(GL_TRIANGLES, 0, 6);
         }
 
-        // Also draw the lamp object
+        // lamp object
         lightCubeShader.use();
         lightCubeShader.setMat4("projection", projection);
         lightCubeShader.setMat4("view", view);
@@ -394,24 +432,6 @@ int main() {
 
         glBindVertexArray(lightCubeVAO);
         glDrawArrays(GL_TRIANGLES, 0, 36);
-
-
-        // Sphere
-//        sphereShader.use();
-//        model = glm::mat4(1.0f);
-//        view = camera.GetViewMatrix();
-//        projection = glm::perspective(glm::radians(camera.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
-//
-//        sphereShader.setMat4("model", model);
-//        sphereShader.setMat4("view", view);
-//        sphereShader.setMat4("projection", projection);
-//
-//
-//        // Renderovanje sfere
-//        glBindVertexArray(sphereVAO);
-//        glPolygonMode(GL_FRONT_AND_BACK, GL_FILL); // Renderuje punu površinu
-//        glDrawArrays(GL_TRIANGLE_STRIP, 0, sphereVertices.size() / 3);
-
 
         glfwSwapBuffers(window);
         glfwPollEvents();
@@ -439,7 +459,6 @@ void processInput(GLFWwindow *window){
 }
 
 // glfw: whenever the window size changed (by OS or user resize) this callback function executes
-// ---------------------------------------------------------------------------------------------
 void framebuffer_size_callback(GLFWwindow* window, int width, int height){
     // make sure the viewport matches the new window dimensions; note that width and
     // height will be significantly larger than specified on retina displays.
@@ -448,7 +467,6 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height){
 
 
 // glfw: whenever the mouse moves, this callback is called
-// -------------------------------------------------------
 void mouse_callback(GLFWwindow* window, double xposIn, double yposIn){
     float xpos = static_cast<float>(xposIn);
     float ypos = static_cast<float>(yposIn);
@@ -469,13 +487,11 @@ void mouse_callback(GLFWwindow* window, double xposIn, double yposIn){
 }
 
 // glfw: whenever the mouse scroll wheel scrolls, this callback is called
-// ----------------------------------------------------------------------
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset){
     camera.ProcessMouseScroll(static_cast<float>(yoffset));
 }
 
-// utility function for loading a 2D texture from file
-// ---------------------------------------------------
+// Utility function for loading a 2D texture from file
 unsigned int loadTexture(char const * path){
     unsigned int textureID;
     glGenTextures(1, &textureID);
@@ -510,7 +526,7 @@ unsigned int loadTexture(char const * path){
     return textureID;
 }
 
-// Funkcija za generisanje verteksa sfere
+// Function for generating sphere vertex
 std::vector<float> generateSphereVertices(float radius, unsigned int sectors, unsigned int stacks) {
     std::vector<float> vertices;
 
@@ -520,9 +536,9 @@ std::vector<float> generateSphereVertices(float radius, unsigned int sectors, un
     float sectorAngle, stackAngle;
 
     for(unsigned int i = 0; i <= stacks; ++i) {
-        stackAngle = M_PI / 2 - i * stackStep;        // počevši od pi/2 do -pi/2
-        xy = radius * cosf(stackAngle);             // radijus * kosinus od latituda
-        z = radius * sinf(stackAngle);              // radijus * sinus od latituda
+        stackAngle = M_PI / 2 - i * stackStep;        // pocevsi od pi/2 do -pi/2
+        xy = radius * cosf(stackAngle);             // precnik * kosinus od latituda
+        z = radius * sinf(stackAngle);              // precnik * sinus od latituda
 
         for(unsigned int j = 0; j <= sectors; ++j) {
             sectorAngle = j * sectorStep;           // longitudinalni ugao
