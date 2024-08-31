@@ -3,6 +3,7 @@
 
 #include "Shader.h"
 #include "Camera.h"
+#include "Model.h"
 #include <stb_image.h>
 
 #include <glm/glm.hpp>
@@ -37,7 +38,7 @@ float lastFrame = 0.0f;
 // Lighting
 glm::vec3 lightPos(1.2f, 1.0f, 6.0f);
 
-glm::vec3 lightPos1(1.2f, 1.0f, 6.0f);
+glm::vec3 lightPos1(1.2f, 6.0f, 6.0f);
 glm::vec3 lightPos2(1.6f, 0.5f, -3.2);
 
 // Sphere color
@@ -83,6 +84,9 @@ int main() {
     Shader soadShader("shaders/soadShader.vs", "shaders/soadShader.fs");
     Shader blackBackgroundShader("shaders/blackBackground.vs", "shaders/blackBackground.fs");
     Shader sphereShader("shaders/sphereShader.vs", "shaders/sphereShader.fs");
+    Shader treeModelShader("shaders/modelShader.vs", "shaders/modelShader.fs");
+
+    Model treeModel("models/objects/Tree 02/Tree.obj");
 
     float lightCubeVertices[] = {
             -0.5f, -0.5f, -0.5f,
@@ -339,6 +343,15 @@ int main() {
 
         glBindVertexArray(floorVAO);
         glDrawArrays(GL_TRIANGLES, 0, 6);
+
+        // --------------------------------treeModel--------------------------------
+
+        // render the loaded model
+        model = glm::mat4(1.0f);
+        model = glm::translate(model, glm::vec3(6.0f, -2.5f, -2.0f)); // translate it down so it's at the center of the scene
+        model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f));	// it's a bit too big for our scene, so scale it down
+        treeModelShader.setMat4("model", model);
+        treeModel.Draw(treeModelShader);
 
         // --------------------------------soad--------------------------------
         soadShader.use();

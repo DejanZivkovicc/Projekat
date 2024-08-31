@@ -77,6 +77,20 @@ build CMakeFiles/Projekat.dir/src/stb_image.cpp.o: CXX_COMPILER__Projekat_Debug 
   OBJECT_DIR = CMakeFiles/Projekat.dir
   OBJECT_FILE_DIR = CMakeFiles/Projekat.dir/src
 
+build CMakeFiles/Projekat.dir/src/Model.cpp.o: CXX_COMPILER__Projekat_Debug /home/kidebratzp/Desktop/Projekat/src/Model.cpp || cmake_object_order_depends_target_Projekat
+  DEP_FILE = CMakeFiles/Projekat.dir/src/Model.cpp.o.d
+  FLAGS = -g -fdiagnostics-color=always
+  INCLUDES = -I/home/kidebratzp/Desktop/Projekat/include -I/home/kidebratzp/Desktop/Projekat/libs/glad/include
+  OBJECT_DIR = CMakeFiles/Projekat.dir
+  OBJECT_FILE_DIR = CMakeFiles/Projekat.dir/src
+
+build CMakeFiles/Projekat.dir/src/Mesh.cpp.o: CXX_COMPILER__Projekat_Debug /home/kidebratzp/Desktop/Projekat/src/Mesh.cpp || cmake_object_order_depends_target_Projekat
+  DEP_FILE = CMakeFiles/Projekat.dir/src/Mesh.cpp.o.d
+  FLAGS = -g -fdiagnostics-color=always
+  INCLUDES = -I/home/kidebratzp/Desktop/Projekat/include -I/home/kidebratzp/Desktop/Projekat/libs/glad/include
+  OBJECT_DIR = CMakeFiles/Projekat.dir
+  OBJECT_FILE_DIR = CMakeFiles/Projekat.dir/src
+
 
 # =============================================================================
 # Link build statements for EXECUTABLE target Projekat
@@ -85,9 +99,9 @@ build CMakeFiles/Projekat.dir/src/stb_image.cpp.o: CXX_COMPILER__Projekat_Debug 
 #############################################
 # Link the executable Projekat
 
-build Projekat: CXX_EXECUTABLE_LINKER__Projekat_Debug CMakeFiles/Projekat.dir/src/main.cpp.o CMakeFiles/Projekat.dir/src/Shader.cpp.o CMakeFiles/Projekat.dir/src/Camera.cpp.o CMakeFiles/Projekat.dir/src/stb_image.cpp.o | libs/glad/libglad.a /usr/lib/x86_64-linux-gnu/libGLX.so /usr/lib/x86_64-linux-gnu/libOpenGL.so || libs/glad/libglad.a
+build Projekat: CXX_EXECUTABLE_LINKER__Projekat_Debug CMakeFiles/Projekat.dir/src/main.cpp.o CMakeFiles/Projekat.dir/src/Shader.cpp.o CMakeFiles/Projekat.dir/src/Camera.cpp.o CMakeFiles/Projekat.dir/src/stb_image.cpp.o CMakeFiles/Projekat.dir/src/Model.cpp.o CMakeFiles/Projekat.dir/src/Mesh.cpp.o | libs/glad/libglad.a /usr/lib/x86_64-linux-gnu/libGLX.so /usr/lib/x86_64-linux-gnu/libOpenGL.so || libs/glad/libglad.a
   FLAGS = -g
-  LINK_LIBRARIES = -lglfw  libs/glad/libglad.a  -lXrandr  -lpthread  -lXi  -lX11  -ldl  /usr/lib/x86_64-linux-gnu/libGLX.so  /usr/lib/x86_64-linux-gnu/libOpenGL.so
+  LINK_LIBRARIES = -lglfw  libs/glad/libglad.a  -lXrandr  -lpthread  -lXi  -lX11  -ldl  -lglfw3  -lGL  -lassimp  /usr/lib/x86_64-linux-gnu/libGLX.so  /usr/lib/x86_64-linux-gnu/libOpenGL.so
   OBJECT_DIR = CMakeFiles/Projekat.dir
   POST_BUILD = :
   PRE_LINK = :
