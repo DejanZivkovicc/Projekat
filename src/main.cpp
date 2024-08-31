@@ -37,6 +37,9 @@ float lastFrame = 0.0f;
 // Lighting
 glm::vec3 lightPos(1.2f, 1.0f, 6.0f);
 
+glm::vec3 lightPos1(1.2f, 1.0f, 6.0f);
+glm::vec3 lightPos2(1.8f, 0.5f, -3.2);
+
 int main() {
     glfwInit();
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
@@ -132,14 +135,6 @@ int main() {
     };
 
     float soadVertices[] = {
-            // Positions            // texture coords
-//            -0.5f, -0.5f, 0.5f,      0.0f,  1.0f,
-//            0.5f, -0.5f, 0.5f,       1.0f,  1.0f,
-//            0.5f, 0.5f, 0.5f,        1.0f,  0.0f,
-//
-//            0.5f, 0.5f, 0.5f,        1.0f,  0.0f,
-//            -0.5f, 0.5f, 0.5f,       0.0f,  0.0f,
-//            -0.5f, -0.5f, 0.5f,      0.0f,  1.0f,
             0.0f,  0.5f,  0.0f,     0.0f,  0.0f,        0.0f, 1.0f, 0.0f,
             0.0f, -0.5f,  0.0f,     0.0f,  1.0f,        0.0f, 1.0f, 0.0f,
             1.0f, -0.5f,  0.0f,     1.0f,  1.0f,        0.0f, 1.0f, 0.0f,
@@ -278,7 +273,9 @@ int main() {
     grassShader.use();
     grassShader.setInt("grassTexture", 0);
 
-    // render loop
+    /* ------------------------------------------------------------------------ */
+    /* ----------------------------- RENDER LOOP ------------------------------ */
+    /* -------------------------------------------------------------------------*/
 
     glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
@@ -295,16 +292,28 @@ int main() {
         glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+
+        // --------------------------------floor--------------------------------
         // Activating shader when setting uniforms/drawing objects
         floorShader.use();
-//        floorShader.setVec3("lightColor", 1.0f, 1.0f, 1.0f);
-        floorShader.setVec3("light.position", lightPos);
-        floorShader.setVec3("viewPos", camera.Position);
-
+        // floorShader.setVec3("light.position", lightPos);
+        // floorShader.setVec3("viewPos", camera.Position);
         // light properties
-        floorShader.setVec3("light.ambient", 0.2f, 0.2f, 0.2f);
-        floorShader.setVec3("light.diffuse", 0.5f, 0.5f, 0.5f);
-        floorShader.setVec3("light.specular", 1.0f, 1.0f, 1.0f);
+//        floorShader.setVec3("light.ambient", 0.2f, 0.2f, 0.2f);
+//        floorShader.setVec3("light.diffuse", 0.5f, 0.5f, 0.5f);
+//        floorShader.setVec3("light.specular", 1.0f, 1.0f, 1.0f);
+
+        // Light cube
+        floorShader.setVec3("light1.position", lightPos1);
+        floorShader.setVec3("light1.ambient", 0.2f, 0.2f, 0.2f);
+        floorShader.setVec3("light1.diffuse", 0.5f, 0.5f, 0.5f);
+        floorShader.setVec3("light1.specular", 1.0f, 1.0f, 1.0f);
+
+        // Pendulum
+        floorShader.setVec3("light2.position", lightPos2);
+        floorShader.setVec3("light2.ambient", 0.2f, 0.2f, 0.2f);
+        floorShader.setVec3("light2.diffuse", 0.5f, 0.5f, 0.5f);
+        floorShader.setVec3("light2.specular", 1.0f, 1.0f, 1.0f);
 
         // material properties
         floorShader.setFloat("material.shininess", 64.0f);
@@ -326,7 +335,7 @@ int main() {
         glBindVertexArray(floorVAO);
         glDrawArrays(GL_TRIANGLES, 0, 6);
 
-        // soad
+        // --------------------------------soad--------------------------------
         soadShader.use();
         soadShader.setVec3("light.position", lightPos);
         soadShader.setVec3("viewPos", camera.Position);
@@ -355,7 +364,7 @@ int main() {
 
         glDrawArrays(GL_TRIANGLES, 0, 6);
 
-        // black background
+        // --------------------------------black background--------------------------------
         blackBackgroundShader.use();
         blackBackgroundShader.setMat4("projection", projection);
         blackBackgroundShader.setMat4("view", view);
@@ -369,7 +378,7 @@ int main() {
         glBindVertexArray(blackBackgroundVAO);
         glDrawArrays(GL_TRIANGLES, 0, 36);
 
-        // Sphere
+        // --------------------------------Sphere--------------------------------
         // Ažuriranje vremena
         float time = glfwGetTime();
         float speed = 2.0f; // brzina oscilacije
@@ -384,7 +393,7 @@ int main() {
         model = glm::mat4(1.0f);
         model = glm::translate(model, glm::vec3(x, y, -3.0f));
 //        model = glm::translate(model, lightPos);
-        model = glm::translate(model, glm::vec3(1.8f, 0.5f, -3.2));
+        model = glm::translate(model, lightPos2);
         model = glm::scale(model, glm::vec3(0.2f)); // a smaller cube
 
         view = camera.GetViewMatrix();
@@ -401,9 +410,7 @@ int main() {
         glBindVertexArray(sphereVAO);
         glDrawArrays(GL_TRIANGLE_STRIP, 0, sphereVertices.size() / 3);
 
-
-
-        // vegetation
+        // --------------------------------vegetation--------------------------------
         grassShader.use();
         projection = glm::perspective(glm::radians(camera.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
         view = camera.GetViewMatrix();
@@ -421,7 +428,7 @@ int main() {
             glDrawArrays(GL_TRIANGLES, 0, 6);
         }
 
-        // lamp object
+        // --------------------------------lamp object--------------------------------
         lightCubeShader.use();
         lightCubeShader.setMat4("projection", projection);
         lightCubeShader.setMat4("view", view);
