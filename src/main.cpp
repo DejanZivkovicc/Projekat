@@ -77,6 +77,10 @@ int main() {
 
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_MULTISAMPLE);
+    glDepthFunc(GL_LESS);
+
+    glEnable(GL_CULL_FACE);
+    glCullFace(GL_FRONT);
 
     Shader lightCubeShader("shaders/lightCubeShader.vs", "shaders/lightCubeShader.fs");
     Shader floorShader("shaders/floorShader.vs", "shaders/floorShader.fs");
@@ -85,53 +89,55 @@ int main() {
     Shader blackBackgroundShader("shaders/blackBackground.vs", "shaders/blackBackground.fs");
     Shader sphereShader("shaders/sphereShader.vs", "shaders/sphereShader.fs");
     Shader modelShader("shaders/modelShader.vs", "shaders/modelShader.fs");
+    Shader crateShader("shaders/crateShader.vs", "shaders/crateShader.fs");
 
     Model treeModel("models/objects/Tree 02/Tree.obj");
     Model cottageModel("models/objects/SpookyManor/Manor.obj");
     Model streetLampModel("models/objects/Street lamp/Street lamp.obj");
 
     float lightCubeVertices[] = {
-            -0.5f, -0.5f, -0.5f,
-            0.5f, -0.5f, -0.5f,
-            0.5f,  0.5f, -0.5f,
-            0.5f,  0.5f, -0.5f,
-            -0.5f,  0.5f, -0.5f,
-            -0.5f, -0.5f, -0.5f,
+            // positions          // normals           // texture coords
+            -0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  0.0f,  0.0f,
+            0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  1.0f,  0.0f,
+            0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  1.0f,  1.0f,
+            0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  1.0f,  1.0f,
+            -0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  0.0f,  1.0f,
+            -0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  0.0f,  0.0f,
 
-            -0.5f, -0.5f,  0.5f,
-            0.5f, -0.5f,  0.5f,
-            0.5f,  0.5f,  0.5f,
-            0.5f,  0.5f,  0.5f,
-            -0.5f,  0.5f,  0.5f,
-            -0.5f, -0.5f,  0.5f,
+            -0.5f, -0.5f,  0.5f,  0.0f,  0.0f,  1.0f,  0.0f,  0.0f,
+            0.5f, -0.5f,  0.5f,  0.0f,  0.0f,  1.0f,  1.0f,  0.0f,
+            0.5f,  0.5f,  0.5f,  0.0f,  0.0f,  1.0f,  1.0f,  1.0f,
+            0.5f,  0.5f,  0.5f,  0.0f,  0.0f,  1.0f,  1.0f,  1.0f,
+            -0.5f,  0.5f,  0.5f,  0.0f,  0.0f,  1.0f,  0.0f,  1.0f,
+            -0.5f, -0.5f,  0.5f,  0.0f,  0.0f,  1.0f,  0.0f,  0.0f,
 
-            -0.5f,  0.5f,  0.5f,
-            -0.5f,  0.5f, -0.5f,
-            -0.5f, -0.5f, -0.5f,
-            -0.5f, -0.5f, -0.5f,
-            -0.5f, -0.5f,  0.5f,
-            -0.5f,  0.5f,  0.5f,
+            -0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f,  1.0f,  0.0f,
+            -0.5f,  0.5f, -0.5f, -1.0f,  0.0f,  0.0f,  1.0f,  1.0f,
+            -0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f,  0.0f,  1.0f,
+            -0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f,  0.0f,  1.0f,
+            -0.5f, -0.5f,  0.5f, -1.0f,  0.0f,  0.0f,  0.0f,  0.0f,
+            -0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f,  1.0f,  0.0f,
 
-            0.5f,  0.5f,  0.5f,
-            0.5f,  0.5f, -0.5f,
-            0.5f, -0.5f, -0.5f,
-            0.5f, -0.5f, -0.5f,
-            0.5f, -0.5f,  0.5f,
-            0.5f,  0.5f,  0.5f,
+            0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,  1.0f,  0.0f,
+            0.5f,  0.5f, -0.5f,  1.0f,  0.0f,  0.0f,  1.0f,  1.0f,
+            0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,  0.0f,  1.0f,
+            0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,  0.0f,  1.0f,
+            0.5f, -0.5f,  0.5f,  1.0f,  0.0f,  0.0f,  0.0f,  0.0f,
+            0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,  1.0f,  0.0f,
 
-            -0.5f, -0.5f, -0.5f,
-            0.5f, -0.5f, -0.5f,
-            0.5f, -0.5f,  0.5f,
-            0.5f, -0.5f,  0.5f,
-            -0.5f, -0.5f,  0.5f,
-            -0.5f, -0.5f, -0.5f,
+            -0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,  0.0f,  1.0f,
+            0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,  1.0f,  1.0f,
+            0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,  1.0f,  0.0f,
+            0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,  1.0f,  0.0f,
+            -0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,  0.0f,  0.0f,
+            -0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,  0.0f,  1.0f,
 
-            -0.5f,  0.5f, -0.5f,
-            0.5f,  0.5f, -0.5f,
-            0.5f,  0.5f,  0.5f,
-            0.5f,  0.5f,  0.5f,
-            -0.5f,  0.5f,  0.5f,
-            -0.5f,  0.5f, -0.5f,
+            -0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  0.0f,  1.0f,
+            0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  1.0f,  1.0f,
+            0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  1.0f,  0.0f,
+            0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  1.0f,  0.0f,
+            -0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  0.0f,  0.0f,
+            -0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  0.0f,  1.0f
     };
 
     float floorVertices[] = {
@@ -188,7 +194,7 @@ int main() {
             glm::vec3 (2.5f, -2.0f, 5.6f),
             glm::vec3 (3.7f, -2.0f, -3.6f),
             glm::vec3 (-1.8f, -2.0f, 2.6f),
-            glm::vec3 (-5.0f, -2.0f, -9.6f),
+            glm::vec3 (-5.0f, -2.0f, -7.6f),
             glm::vec3 (0.0f, -2.0f, 0.0f)
     };
 
@@ -206,7 +212,7 @@ int main() {
     glBindVertexArray(lightCubeVAO);
     glBindBuffer(GL_ARRAY_BUFFER, lightCubeVBO);
     glBufferData(GL_ARRAY_BUFFER, sizeof(lightCubeVertices), lightCubeVertices, GL_STATIC_DRAW);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
 
     // floor VAO
@@ -221,6 +227,20 @@ int main() {
     glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
     glEnableVertexAttribArray(1);
     glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(5 * sizeof(float)));
+    glEnableVertexAttribArray(2);
+
+    // crate VAO
+    unsigned int crateVAO, crateVBO;
+    glGenVertexArrays(1, &crateVAO);
+    glGenBuffers(1, &crateVBO);
+    glBindVertexArray(crateVAO);
+    glBindBuffer(GL_ARRAY_BUFFER, crateVBO);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(lightCubeVertices), lightCubeVertices, GL_STATIC_DRAW);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
+    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
+    glEnableVertexAttribArray(1);
+    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
     glEnableVertexAttribArray(2);
 
     // soad VAO
@@ -279,11 +299,16 @@ int main() {
     unsigned int grassTexture = loadTexture("textures/grass.png");
     unsigned int soadTexture = loadTexture("textures/soad.jpg");
     unsigned int sphereTexture = loadTexture("textures/glass.jpg");
+    unsigned int crateTexture = loadTexture("textures/crate.jpeg");
 
     // Shader configuration
     floorShader.use();
     floorShader.setInt("material.diffuse", 0);
     floorShader.setInt("material.specular", 1);
+
+    crateShader.use();
+    crateShader.setInt("material.diffuse", 0);
+    crateShader.setInt("material.specular", 1);
 
     soadShader.use();
     soadShader.setInt("material.diffuse", 0);
@@ -378,7 +403,6 @@ int main() {
         cottageModel.Draw(modelShader);
 
         // --------------------------------streetLampModel--------------------------------
-//        glm::vec3( -10.5f, 0.0f, 5.01f)
         // render the loaded model
         model = glm::mat4(1.0f);
         model = glm::translate(model, glm::vec3(-3.93f)); // translate it down so it's at the center of the scene
@@ -386,6 +410,49 @@ int main() {
         modelShader.setMat4("model", model);
         streetLampModel.Draw(modelShader);
 
+
+        // --------------------------------crate--------------------------------
+        crateShader.use();
+        crateShader.setVec3("light.position", lightPos1);
+        crateShader.setVec3("viewPos", camera.Position);
+
+        // light properties
+        crateShader.setVec3("light.ambient", 0.2f, 0.2f, 0.2f);
+        crateShader.setVec3("light.diffuse", 0.5f, 0.5f, 0.5f);
+        crateShader.setVec3("light.specular", 1.0f, 1.0f, 1.0f);
+
+        // Light cube
+//        floorShader.setVec3("light1.position", lightPos1);
+//        floorShader.setVec3("light1.ambient", 0.2f, 0.2f, 0.2f);
+//        floorShader.setVec3("light1.diffuse", 0.5f, 0.5f, 0.5f);
+//        floorShader.setVec3("light1.specular", 1.0f, 1.0f, 1.0f);
+//
+//        // Pendulum
+//        floorShader.setVec3("light2.position", lightPos2);
+//        floorShader.setVec3("light2.ambient", 0.2f, 0.2f, 0.2f);
+//        floorShader.setVec3("light2.diffuse", 0.5f, 0.5f, 0.5f);
+//        floorShader.setVec3("light2.specular", 1.0f, 1.0f, 1.0f);
+
+        // material properties
+        crateShader.setFloat("material.shininess", 64.0f);
+
+        projection = glm::perspective(glm::radians(camera.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
+        view = camera.GetViewMatrix();
+        crateShader.setMat4("projection", projection);
+        crateShader.setMat4("view", view);
+
+        model = glm::mat4(1.0f);
+        model = glm::scale(model, glm::vec3(1.0f)); // a smaller cube
+        model = glm::translate(model, glm::vec3(0.0f, -2.0f, -2.0f));
+        crateShader.setMat4("model", model);
+
+        glCullFace(GL_FRONT);
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, crateTexture);
+        glBindVertexArray(crateVAO);
+        glDrawArrays(GL_TRIANGLES, 0, 36);
+
+        glDisable(GL_CULL_FACE);
         // --------------------------------soad--------------------------------
         soadShader.use();
         soadShader.setVec3("light.position", lightPos1);
@@ -492,6 +559,7 @@ int main() {
         glBindVertexArray(lightCubeVAO);
         glDrawArrays(GL_TRIANGLES, 0, 36);
 
+        glEnable(GL_CULL_FACE);
         glfwSwapBuffers(window);
         glfwPollEvents();
     }
