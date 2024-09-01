@@ -75,10 +75,12 @@ int main() {
         return -1;
     }
 
+    // Enabling Anti aliasing
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_MULTISAMPLE);
     glDepthFunc(GL_LESS);
 
+    // Enabling Cull Face
     glEnable(GL_CULL_FACE);
     glCullFace(GL_FRONT);
 
@@ -161,15 +163,15 @@ int main() {
             1.0f,  0.5f,  0.0f,     1.0f,  0.0f,        0.0f, 1.0f, 0.0f
     };
 
-    float blackBackgroundVertices[] = {
-            0.0f,  0.5f,  0.0f,
-            0.0f, -0.5f,  0.0f,
-            1.0f, -0.5f,  0.0f,
-
-            0.0f,  0.5f,  0.0f,
-            1.0f, -0.5f,  0.0f,
-            1.0f,  0.5f,  0.0f
-    };
+//    float blackBackgroundVertices[] = {
+//            0.0f,  0.5f,  0.0f,
+//            0.0f, -0.5f,  0.0f,
+//            1.0f, -0.5f,  0.0f,
+//
+//            0.0f,  0.5f,  0.0f,
+//            1.0f, -0.5f,  0.0f,
+//            1.0f,  0.5f,  0.0f
+//    };
 
     float grassVertices[] = {
             // positions         // texture Coords          // Normal Coords
@@ -263,8 +265,8 @@ int main() {
     glGenBuffers(1, &blackBackgroundVBO);
     glBindVertexArray(blackBackgroundVAO);
     glBindBuffer(GL_ARRAY_BUFFER, blackBackgroundVBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(blackBackgroundVertices), blackBackgroundVertices, GL_STATIC_DRAW);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(lightCubeVertices), lightCubeVertices, GL_STATIC_DRAW);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
 
     // sphere VAO
@@ -343,12 +345,6 @@ int main() {
         // --------------------------------floor--------------------------------
         // Activating shader when setting uniforms/drawing objects
         floorShader.use();
-        // floorShader.setVec3("light.position", lightPos);
-        // floorShader.setVec3("viewPos", camera.Position);
-        // light properties
-//        floorShader.setVec3("light.ambient", 0.2f, 0.2f, 0.2f);
-//        floorShader.setVec3("light.diffuse", 0.5f, 0.5f, 0.5f);
-//        floorShader.setVec3("light.specular", 1.0f, 1.0f, 1.0f);
 
         // Light cube
         floorShader.setVec3("light1.position", lightPos1);
@@ -385,6 +381,22 @@ int main() {
         // --------------------------------treeModel--------------------------------
 
         // render the loaded model
+        // Light cube
+        modelShader.setVec3("light1.position", lightPos1);
+        modelShader.setVec3("light1.ambient", 0.2f, 0.2f, 0.2f);
+        modelShader.setVec3("light1.diffuse", 0.5f, 0.5f, 0.5f);
+        modelShader.setVec3("light1.specular", 1.0f, 1.0f, 1.0f);
+
+        // Pendulum
+        modelShader.setVec3("light2.position", lightPos2);
+        modelShader.setVec3("light2.ambient", 0.2f, 0.2f, 0.2f);
+        modelShader.setVec3("light2.diffuse", 0.5f, 0.5f, 0.5f);
+        modelShader.setVec3("light2.specular", 1.0f, 1.0f, 1.0f);
+
+        // material properties
+        modelShader.setFloat("material.shininess", 64.0f);
+
+
         model = glm::mat4(1.0f);
         for(int i = 0; i < trees.size(); i++) {
             model = glm::translate(model, trees[i]); // translate it down so it's at the center of the scene
@@ -488,13 +500,11 @@ int main() {
         blackBackgroundShader.setMat4("view", view);
         model = glm::mat4(1.0f);
         model = glm::scale(model, glm::vec3(3.2f, 4.0f, 3.2f)); // a smaller cube
-        model = glm::translate(model, glm::vec3(0.0f, -0.1f, -2.01));
-//        model = glm::translate(model, lightPos);
-//        model = glm::scale(model, glm::vec3(1.0f)); // a smaller cube
+        model = glm::translate(model, glm::vec3(0.5f, -0.1f, -1.505));
         lightCubeShader.setMat4("model", model);
 
         glBindVertexArray(blackBackgroundVAO);
-        glDrawArrays(GL_TRIANGLES, 0, 36);
+        glDrawArrays(GL_TRIANGLES, 0, 6);
 
         // --------------------------------Sphere--------------------------------
         // Ažuriranje vremena
@@ -566,6 +576,19 @@ int main() {
 
     glDeleteVertexArrays(1, &floorVAO);
     glDeleteBuffers(1, &floorVBO);
+    glDeleteVertexArrays(1, &crateVAO);
+    glDeleteBuffers(1, &crateVBO);
+    glDeleteVertexArrays(1, &soadVAO);
+    glDeleteBuffers(1, &soadVBO);
+    glDeleteVertexArrays(1, &blackBackgroundVAO);
+    glDeleteBuffers(1, &blackBackgroundVBO);
+    glDeleteVertexArrays(1, &sphereVAO);
+    glDeleteBuffers(1, &sphereVBO);
+    glDeleteVertexArrays(1, &grassVAO);
+    glDeleteBuffers(1, &grassVBO);
+    glDeleteVertexArrays(1, &lightCubeVAO);
+    glDeleteBuffers(1, &lightCubeVBO);
+
     glfwTerminate();
 
     return 0;
