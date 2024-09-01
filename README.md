@@ -10,7 +10,7 @@ korišćene relativne putanje do šejdera, tekstura i modela.
 ### Sadržaj projekta
 Shader, Camera, Model klase
 Učitane teksture, kocka (Culling Face), modeli, dvostruko svetlo (glavno ("sfera"), sa
-animacijom klatna, i manje, smešteno unutar modela bandere), anti aliasing
+animacijom klatna, i manje, smešteno unutar modela bandere), anti aliasing i blending.
 
 ### Uputstvo korišćenja
 Kamera: WASD za kretanje, točkić na mišu za zoom

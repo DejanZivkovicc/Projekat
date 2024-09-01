@@ -163,15 +163,6 @@ int main() {
             1.0f,  0.5f,  0.0f,     1.0f,  0.0f,        0.0f, 1.0f, 0.0f
     };
 
-//    float blackBackgroundVertices[] = {
-//            0.0f,  0.5f,  0.0f,
-//            0.0f, -0.5f,  0.0f,
-//            1.0f, -0.5f,  0.0f,
-//
-//            0.0f,  0.5f,  0.0f,
-//            1.0f, -0.5f,  0.0f,
-//            1.0f,  0.5f,  0.0f
-//    };
 
     float grassVertices[] = {
             // positions         // texture Coords          // Normal Coords
@@ -425,25 +416,16 @@ int main() {
 
         // --------------------------------crate--------------------------------
         crateShader.use();
-        crateShader.setVec3("light.position", lightPos1);
-        crateShader.setVec3("viewPos", camera.Position);
 
-        // light properties
-        crateShader.setVec3("light.ambient", 0.2f, 0.2f, 0.2f);
-        crateShader.setVec3("light.diffuse", 0.5f, 0.5f, 0.5f);
-        crateShader.setVec3("light.specular", 1.0f, 1.0f, 1.0f);
+        crateShader.setVec3("light1.position", lightPos1);
+        crateShader.setVec3("light1.ambient", 0.2f, 0.2f, 0.2f);
+        crateShader.setVec3("light1.diffuse", 0.5f, 0.5f, 0.5f);
+        crateShader.setVec3("light1.specular", 1.0f, 1.0f, 1.0f);
 
-        // Light cube
-//        floorShader.setVec3("light1.position", lightPos1);
-//        floorShader.setVec3("light1.ambient", 0.2f, 0.2f, 0.2f);
-//        floorShader.setVec3("light1.diffuse", 0.5f, 0.5f, 0.5f);
-//        floorShader.setVec3("light1.specular", 1.0f, 1.0f, 1.0f);
-//
-//        // Pendulum
-//        floorShader.setVec3("light2.position", lightPos2);
-//        floorShader.setVec3("light2.ambient", 0.2f, 0.2f, 0.2f);
-//        floorShader.setVec3("light2.diffuse", 0.5f, 0.5f, 0.5f);
-//        floorShader.setVec3("light2.specular", 1.0f, 1.0f, 1.0f);
+        crateShader.setVec3("light2.position", lightPos2);
+        crateShader.setVec3("light2.ambient", 0.2f, 0.2f, 0.2f);
+        crateShader.setVec3("light2.diffuse", 0.5f, 0.5f, 0.5f);
+        crateShader.setVec3("light2.specular", 1.0f, 1.0f, 1.0f);
 
         // material properties
         crateShader.setFloat("material.shininess", 64.0f);
