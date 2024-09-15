@@ -17,8 +17,3 @@ Kamera: WASD za kretanje, točkić na mišu za zoom
 Dugmici "1" i "2" za menjanje boje na sferi 
 
 ![slikaProjekta.png](img%2FslikaProjekta.png)
-
-P.S. Iako remeti, žao mi je da obrišem crnu teksturu, jer originalna ideja je bila fokus
-oko nje i to je zašto ona postoji ovde.
- 
-It ain't much but it's honest work.
